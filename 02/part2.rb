@@ -28,7 +28,6 @@ until $memory[0] == 19690720 or b > 99 do
   $pc = 0
   $memory[1] = a
   $memory[2] = b
-  puts $memory.join ','
 
   while $pc < $memory.length do
     op = $memory[$pc]
@@ -40,5 +39,5 @@ until $memory[0] == 19690720 or b > 99 do
     f.()
   end
 
-  puts "#{100 * a + b}"
+  puts "#{100 * a + b} = #{$memory[0]}" if $memory[0] == 19690720
 end
