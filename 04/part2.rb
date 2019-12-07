@@ -32,8 +32,6 @@ def count(start, finish, single_increment=false)
 
     has_repeat = repeats.any?{|c| c[1] == 2}
 
-    puts "#{start}, #{has_repeat}"
-
     if in_order and has_repeat
       passwords << start
     end
