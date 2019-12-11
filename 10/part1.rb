@@ -16,26 +16,48 @@ until (line = gets.strip).empty?
 end
 height = y
 
+chars = name.length + 1
+format = "%#{chars}.#{chars}s"
+for y in 0...height
+  for x in 0...width
+    print(if asteroids[[x, y]]
+            format % asteroids[[x, y]][:name]
+          else
+            format % '.'
+          end)
+  end
+  puts
+end
+
 asteroids.keys.each_with_index do |a, i|
   ax, ay = a
   asteroids.keys[(i+1)..-1].each_with_index do |b, j|
     bx, by = b
 
     dx, dy = bx - ax, by - ay
-    m = if dx == 0 then 0.to_f else dy.to_f / dx.to_f end
+    m = if dx == 0 then Float::INFINITY else dy.to_f / dx.to_f end
     c = ay.to_f - m * ax.to_f
-    sparse = dx < dy
+    iterate_y = dx < dy
 
-    range = if sparse then (ay+1)...by elsif ax < bx then (ax+1)...bx else (ax).downto(bx) end
-    transform = lambda { |v| if sparse then [if m == 0 then ax else (v.to_f - c.to_f) / m end, v] else [v, m.to_f * v.to_f + c.to_f] end }
+    range = if iterate_y
+              # we never draw upwards!
+              ((ay+1)...by).map{|y| [if m == Float::INFINITY then ax else (y.to_f - c.to_f) / m end, y]}
+            else
+              (if ax < bx
+                (ax + 1)...bx
+              else
+                (ax - 1).downto(bx + 1)
+              end).map{|x| [x, m.to_f * x.to_f + c.to_f]}
+            end
 
     blocked_by = nil
     if range.all? { |v|
-        x, y = transform.call(v)
+        x, y = v
         possible = x % 1 == 0 && y % 1 == 0
         coords = [x.to_i, y.to_i]
         blocked = possible && asteroids.has_key?(coords)
         blocked_by = asteroids[coords][:name] if blocked
+        puts "#{asteroids[a][:name]} to #{asteroids[b][:name]}: (#{x},#{y}): #{blocked_by}"
         !blocked
       }
 
@@ -50,19 +72,6 @@ end
 
 winner = asteroids.keys[asteroids.values.map{|v| v[:visible].length}.each_with_index.max[1]]
 puts "#{asteroids[winner][:name]} can see #{asteroids[winner][:visible].length} from #{winner[0]},#{winner[1]}"
-
-chars = name.length + 1
-format = "%#{chars}.#{chars}s"
-for y in 0...height
-  for x in 0...width
-    print(if asteroids[[x, y]]
-            format % asteroids[[x, y]][:name]
-          else
-            format % '.'
-          end)
-  end
-  puts
-end
 
 
 
