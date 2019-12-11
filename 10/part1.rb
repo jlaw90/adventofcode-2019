@@ -28,7 +28,7 @@ end
 
 # Now we can filter by which asteroids we can see!
 asteroids.each do |k, v|
-  grouped = v[:perception].group_by{|v| v[1]}.sort_by { |v | v[2] }
+  grouped = v[:perception].group_by{|v| v[1]}
   v[:visible] = grouped.length
 end
 
