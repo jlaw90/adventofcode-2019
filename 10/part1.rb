@@ -18,11 +18,11 @@ asteroids.keys.each_with_index do |a, i|
     x2, y2 = b
 
     dx, dy = x2 - x1, y2 - y1
-    angle = Math.atan2(dy, dx) * (180 / Math::PI)
+    angle = Math.atan2(dy, dx)
     distance = Math.sqrt(dx*dx + dy*dy)
 
     asteroids[a][:perception] << [asteroids[b][:name], angle, distance]
-    asteroids[b][:perception] << [asteroids[a][:name], Math.atan2(y1 - y2, x1 - x2) * (180 / Math::PI), distance]
+    asteroids[b][:perception] << [asteroids[a][:name], Math.atan2(y1 - y2, x1 - x2), distance]
   end
 end
 
