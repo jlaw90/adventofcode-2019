@@ -26,8 +26,8 @@ asteroids.keys.each_with_index do |a, i|
     c = ay.to_f - m * ax.to_f
     sparse = dx < dy
 
-    range = if sparse then if ay < by then (ay+1)...by else (ay-1).downto(by+1) end elsif ax < bx then (ax+1)...bx else (ax-1).downto(bx+1) end
-    transform = lambda { |v| if sparse then [if m == 0 then ax else (v.to_f - c) / m end, v] else [v, m * v.to_f + c] end }
+    range = if sparse then (ay+1)...by elsif ax < bx then (ax+1)...bx else (ax).downto(bx) end
+    transform = lambda { |v| if sparse then [if m == 0 then ax else (v.to_f - c.to_f) / m end, v] else [v, m.to_f * v.to_f + c.to_f] end }
 
     blocked_by = nil
     if range.all? { |v|
@@ -66,50 +66,50 @@ end
 
 
 
-canvas = Magick::ImageList.new
-canvas_size = 20
-canvas.new_image(width * canvas_size, height * canvas_size, Magick::SolidFill.new('black'))
-
-
-alter_point = lambda { |x, y| [x * canvas_size + (canvas_size/2), y * canvas_size + (canvas_size / 2)] }
-
-drawer = Magick::Draw.new
-asteroids.keys.each do |a|
-  x, y = alter_point.call(*a)
-
-  asteroids[a][:visible].each do |b|
-    drawer.stroke('yellow')
-    drawer.fill_opacity(0)
-    drawer.stroke_opacity(0.2)
-    drawer.stroke_width(1)
-
-    bx, by = alter_point.call(*b)
-    drawer.line(x, y, bx, by)
-  end
-
-  asteroids[a][:blocked].each do |b|
-    drawer.stroke('red')
-    drawer.fill_opacity(0)
-    drawer.stroke_opacity(0.2)
-    drawer.stroke_width(1)
-
-    bx, by = alter_point.call(*b[0])
-    drawer.line(x, y, bx, by)
-  end
-
-  drawer.fill_opacity(1)
-  drawer.fill(if a == winner then 'red' else 'white' end)
-  drawer.pointsize(10)
-
-
-  drawer.point(x, y)
-end
-
-# drawer.draw(canvas)
-# canvas.write('test.png')
-
-asteroids.keys.each do |coord|
-  a = asteroids[coord]
-  puts "#{a[:name]}: can  see #{a[:visible].map{|v|asteroids[v][:name]}.join(',')}"
-  puts "#{' ' * a[:name].length}  cant see #{a[:blocked].map{|v| "#{asteroids[v[0]][:name]} (#{v[1]})"}.join(',')}"
-end
+# canvas = Magick::ImageList.new
+# canvas_size = 20
+# canvas.new_image(width * canvas_size, height * canvas_size, Magick::SolidFill.new('black'))
+#
+#
+# alter_point = lambda { |x, y| [x * canvas_size + (canvas_size/2), y * canvas_size + (canvas_size / 2)] }
+#
+# drawer = Magick::Draw.new
+# asteroids.keys.each do |a|
+#   x, y = alter_point.call(*a)
+#
+#   asteroids[a][:visible].each do |b|
+#     drawer.stroke('yellow')
+#     drawer.fill_opacity(0)
+#     drawer.stroke_opacity(0.2)
+#     drawer.stroke_width(1)
+#
+#     bx, by = alter_point.call(*b)
+#     drawer.line(x, y, bx, by)
+#   end
+#
+#   asteroids[a][:blocked].each do |b|
+#     drawer.stroke('red')
+#     drawer.fill_opacity(0)
+#     drawer.stroke_opacity(0.2)
+#     drawer.stroke_width(1)
+#
+#     bx, by = alter_point.call(*b[0])
+#     drawer.line(x, y, bx, by)
+#   end
+#
+#   drawer.fill_opacity(1)
+#   drawer.fill(if a == winner then 'red' else 'white' end)
+#   drawer.pointsize(10)
+#
+#
+#   drawer.point(x, y)
+# end
+#
+# # drawer.draw(canvas)
+# # canvas.write('test.png')
+#
+# asteroids.keys.each do |coord|
+#   a = asteroids[coord]
+#   puts "#{a[:name]}: can  see #{a[:visible].map{|v|asteroids[v][:name]}.join(',')}"
+#   puts "#{' ' * a[:name].length}  cant see #{a[:blocked].map{|v| "#{asteroids[v[0]][:name]} (#{v[1]})"}.join(',')}"
+# end
