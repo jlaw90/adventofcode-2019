@@ -5,29 +5,33 @@ until (line = gets.strip).empty?
   moons << { :position => regexp.match(line).captures.map(&:to_i), :velocity => [0,0,0] }
 end
 
-1000.times do |v|
-  # Apply gravity
-  moons.each_with_index do |a, i|
-    ap, av = a[:position], a[:velocity]
-    moons[(i+1)..-1].each do |b|
-      bp, bv = b[:position], b[:velocity]
-      3.times do |j|
-        d = ap[j] <=> bp[j]
-        av[j] -= d
-        bv[j] += d
+initial_positions = moons.map{ |m| m[:position].dup }
+
+solve_time = []
+3.times do |axis|
+  iterations = 0
+  until iterations > 0 && moons.each_with_index.all?{ |m, i| m[:position] == initial_positions[i] && m[:velocity][axis] == 0 } do
+    # Apply gravity
+    moons.each_with_index do |a, i|
+      ap, av = a[:position][axis], a[:velocity]
+      moons[(i+1)..-1].each do |b|
+        bv = b[:velocity]
+        d = ap <=> b[:position][axis]
+        av[axis] -= d
+        bv[axis] += d
       end
     end
+
+    # Update positions
+    moons.each do |a|
+      a[:position][axis] += a[:velocity][axis]
+    end
+
+    iterations += 1
   end
 
-  # Update positions
-  moons.each do |a|
-    ap, av = a[:position], a[:velocity]
-    3.times {|i| ap[i] += av[i]}
-  end
+  solve_time << iterations
 end
 
-# Calculate energy
-potential_energy = moons.map{|m| m[:position].map(&:abs).sum}
-kinetic_energy = moons.map{|m| m[:velocity].map(&:abs).sum}
-total_energy = moons.length.times.map {|i| potential_energy[i] * kinetic_energy[i]}
-puts total_energy.sum
+# Print solve time
+puts "Orbital repetition time: #{solve_time.reduce(:lcm)}"
