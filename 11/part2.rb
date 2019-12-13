@@ -144,44 +144,22 @@ while vm.step do
   next if paint == -1 || turn == -1
 
   panels[location] = paint
-  direction += if turn == 0 then 1 else -1 end
+  direction += if turn == 0 then -1 else 1 end
   direction %= directions.length
   direction = 3 if direction < 0
   x = location[0] + case directions[direction] when :left then -1 when :right then 1 else 0 end
   y = location[1] + case directions[direction] when :up then -1 when :down then 1 else 0 end
-  puts "robot turns #{if turn == 0 then 'anti-clockwise' else 'clockwise' end} and moves #{directions[direction]} from #{location * ','} to #{x},#{y}"
   location = [x, y]
-  minx = [minx, location[0]].min
-  miny = [miny, location[1]].min
-  maxx = [maxx, location[0]].max
-  maxy = [maxy, location[1]].max
+  minx = [minx, x].min
+  miny = [miny, y].min
+  maxx = [maxx, x].max
+  maxy = [maxy, y].max
   paint, turn = -1, -1
 end
 
-require 'rmagick'
-
-canvas = Magick::ImageList.new
-width = maxx-minx
-height = maxy-miny
-canvas.new_image(width*2, height*2, Magick::SolidFill.new('black'))
-
-circle = Magick::Draw.new
-circle.fill('white')
-circle.fill_opacity(0.5)
-circle.stroke('white')
-circle.stroke_opacity(0.5)
-circle.stroke_width(2)
-circle.pointsize(2)
-
 for y in miny..maxy
-  for x in minx..maxx
-    circle.point(minx + x * 2, miny + y * 2)
-    print(if panels[[x,y]] === 1 then '  ' else '# ' end)
+  for x in minx...maxx
+    print(if panels[[x,y]] === 1 then '##' else '  ' end)
   end
   puts
 end
-
-circle.draw(canvas)
-canvas.write 'test.png'
-
-puts panels.length
